@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-import os, re, sys
+import fnmatch, os, re, sys
 from optparse import OptionParser
 
 parser = OptionParser()
+parser.add_option("-x", "--exclude",
+                  help="Files to exclude")
 
 
 def findFiles(path, regex):
@@ -20,6 +22,8 @@ if __name__ == "__main__":
 
   sourceFileRegEx = re.compile(".*\.(c|cpp|h|hpp|m|mm)")
   headerFileRegEx = re.compile(".*\.(h|hpp)")
+  excludeFileRegEx = re.compile(fnmatch.translate(os.path.normpath(options.exclude or "")))
+
   paths = args
   files = []
   for p in paths:
@@ -28,12 +32,13 @@ if __name__ == "__main__":
   includeRegEx = re.compile('^#[ \t]*include[ \t]*[<"](.*)[>"]')
   includes = set()
   for file in files:
-    f = open(file)
-    for line in f:
-      match = includeRegEx.match(line)
-      if match:
-        filename = os.path.basename(match.group(1))
-        includes.add(filename)
+    if not excludeFileRegEx.match(file):
+      f = open(file)
+      for line in f:
+        match = includeRegEx.match(line)
+        if match:
+          filename = os.path.basename(match.group(1))
+          includes.add(filename)
 
   includedFiles = []
   for file in files:
