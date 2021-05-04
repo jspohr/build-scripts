@@ -1,3 +1,3 @@
 FROM ubuntu:20.04
 RUN apt-get update && \
-    apt-get install -y g++ cmake ninja-build python
+    apt-get install -y g++ cmake ninja-build python3
